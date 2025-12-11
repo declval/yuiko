@@ -1,0 +1,25 @@
+.cursor {
+  position: relative;
+}
+
+@keyframes slide {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+.cursor::after {
+  animation: 100ms slide;
+  background-color: #262626;
+  bottom: 0;
+  content: "";
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: -1;
+}
