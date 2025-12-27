@@ -19,16 +19,21 @@ export default function Text() {
       return;
     }
 
-    const changeHandler = () => {
-      const textareaValue = textarea.value.trim();
+    const inputHandler = () => {
+      let textareaValue = textarea.value.replaceAll(
+        /[^\w !"#$%&'\(\)*+,\-.\/:;<=>?@\[\\\]^_`\{\|\}~]/g,
+        ""
+      );
 
+      textarea.value = textareaValue;
+      textareaValue = textareaValue.trim();
       localStorage.setItem("text", textareaValue);
       setWords(textareaValue.split(" "));
     };
 
-    textarea.addEventListener("change", changeHandler);
+    textarea.addEventListener("input", inputHandler);
 
-    return () => textarea.removeEventListener("change", changeHandler);
+    return () => textarea.removeEventListener("change", inputHandler);
   }, []);
 
   return (
