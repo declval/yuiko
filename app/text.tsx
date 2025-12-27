@@ -12,6 +12,7 @@ let characters: Characters;
 
 export default function Text() {
   const [charElems, setCharElems] = useState(() => [] as React.JSX.Element[]);
+  const [speed, setSpeed] = useState(-1);
 
   const handleKeydown = (event: KeyboardEvent) => {
     if (event.key.length > 1) {
@@ -27,9 +28,9 @@ export default function Text() {
     const text = localStorage.getItem("text");
 
     if (text !== null && text.length > 0) {
-      characters = new Characters(text.split(" "));
+      characters = new Characters(setSpeed, text.split(" "));
     } else {
-      characters = new Characters();
+      characters = new Characters(setSpeed);
     }
 
     setCharElems(characters.render());
@@ -41,10 +42,11 @@ export default function Text() {
 
   return (
     <div className={`${robotoMono.className} flex-1`}>
-      <div className="flex h-full items-center justify-center text-3xl">
-        <div className="flex flex-wrap justify-center max-w-4xl">
+      <div className="flex flex-col h-full items-center justify-center">
+        <div className="flex flex-wrap justify-center max-w-4xl text-3xl">
           {charElems}
         </div>
+        <div className="mt-8 text-zinc-600">{speed >= 0 ? speed : "-"} WPM</div>
       </div>
     </div>
   );

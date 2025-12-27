@@ -11,15 +11,19 @@ export default class Characters {
   #chunkSize: number;
   #chunkStart: number;
   #i;
+  #setSpeed;
+  #start?: number;
   #words: string[];
 
   constructor(
+    setSpeed: React.Dispatch<React.SetStateAction<number>>,
     words: string[] = config.text.split(" "),
     chunkSize: number = config.chunkSize
   ) {
     this.#chunkSize = chunkSize;
     this.#chunkStart = 0;
     this.#i = -1;
+    this.#setSpeed = setSpeed;
     this.#words = words;
 
     this.next();
@@ -27,12 +31,24 @@ export default class Characters {
 
   next(key?: string) {
     if (this.#i + 1 >= this.#chunk.length) {
+      if (this.#start !== undefined) {
+        const elapsedMinutes = (Date.now() - this.#start) / 1000 / 60;
+        const wordCount = this.#chunk.length / 5;
+        const speed = Math.round(wordCount / elapsedMinutes);
+        this.#setSpeed(speed);
+        this.#start = undefined;
+      }
+
       this.#i = -1;
       this.#chunk = this.#nextChunk();
     }
 
     if (this.#i >= 0) {
       if (key !== undefined) {
+        if (this.#start === undefined) {
+          this.#start = Date.now();
+        }
+
         const isValid = this.#validate(key);
 
         if (!isValid) {
