@@ -11,11 +11,14 @@ export default class Characters {
   #chunkSize: number;
   #chunkStart: number;
   #i;
+  #invalidPositions?: Set<number>;
+  #setAccuracy;
   #setSpeed;
   #start?: number;
   #words: string[];
 
   constructor(
+    setAccuracy: React.Dispatch<React.SetStateAction<number>>,
     setSpeed: React.Dispatch<React.SetStateAction<number>>,
     words: string[] = config.text.split(" "),
     chunkSize: number = config.chunkSize
@@ -23,6 +26,7 @@ export default class Characters {
     this.#chunkSize = chunkSize;
     this.#chunkStart = 0;
     this.#i = -1;
+    this.#setAccuracy = setAccuracy;
     this.#setSpeed = setSpeed;
     this.#words = words;
 
@@ -31,6 +35,16 @@ export default class Characters {
 
   next(key?: string) {
     if (this.#i + 1 >= this.#chunk.length) {
+      if (this.#invalidPositions !== undefined) {
+        const accuracy = Math.round(
+          ((this.#chunk.length - this.#invalidPositions.size) /
+            this.#chunk.length) *
+            100
+        );
+        this.#setAccuracy(accuracy);
+        this.#invalidPositions = undefined;
+      }
+
       if (this.#start !== undefined) {
         const elapsedMinutes = (Date.now() - this.#start) / 1000 / 60;
         const wordCount = this.#chunk.length / 5;
@@ -45,6 +59,10 @@ export default class Characters {
 
     if (this.#i >= 0) {
       if (key !== undefined) {
+        if (this.#invalidPositions === undefined) {
+          this.#invalidPositions = new Set();
+        }
+
         if (this.#start === undefined) {
           this.#start = Date.now();
         }
@@ -52,6 +70,7 @@ export default class Characters {
         const isValid = this.#validate(key);
 
         if (!isValid) {
+          this.#invalidPositions.add(this.#i);
           return;
         }
       }
