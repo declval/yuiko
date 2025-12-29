@@ -34,6 +34,27 @@ export default class Characters {
   }
 
   next(key?: string) {
+    if (this.#i >= 0) {
+      if (key !== undefined) {
+        if (this.#invalidPositions === undefined) {
+          this.#invalidPositions = new Set();
+        }
+
+        if (this.#start === undefined) {
+          this.#start = Date.now();
+        }
+
+        const isValid = this.#validate(key);
+
+        if (!isValid) {
+          this.#invalidPositions.add(this.#i);
+          return;
+        }
+      }
+
+      this.#chunk[this.#i].classes.delete(styles.cursor);
+    }
+
     if (this.#i + 1 >= this.#chunk.length) {
       if (this.#invalidPositions !== undefined) {
         const accuracy = Math.round(
@@ -55,27 +76,6 @@ export default class Characters {
 
       this.#i = -1;
       this.#chunk = this.#nextChunk();
-    }
-
-    if (this.#i >= 0) {
-      if (key !== undefined) {
-        if (this.#invalidPositions === undefined) {
-          this.#invalidPositions = new Set();
-        }
-
-        if (this.#start === undefined) {
-          this.#start = Date.now();
-        }
-
-        const isValid = this.#validate(key);
-
-        if (!isValid) {
-          this.#invalidPositions.add(this.#i);
-          return;
-        }
-      }
-
-      this.#chunk[this.#i].classes.delete(styles.cursor);
     }
 
     this.#chunk[++this.#i].classes.add(styles.cursor);
